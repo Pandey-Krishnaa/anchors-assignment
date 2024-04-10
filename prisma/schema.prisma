@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Company {
+  id                       Int      @id @default(autoincrement())
+  name                     String?  
+  email                    String   @unique
+  otp                      Int?
+  teamSize                 Int?
+  websiteLink              String?
+  logo                     String?
+  logoPubId                String?
+  credits                  Int      @default(200)
+  jobs                     Job[]  
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  balanceHistory           CompanyBalanceHistory[]
+}
+
+
+model Student{
+  id                       Int      @id @default(autoincrement())
+  name                     String?  
+  email                    String   @unique
+  otp                      Int?
+  phoneNumber              BigInt?
+  resume                   String?
+  resumePubId              String?
+  profilePic               String?
+  profilePicPubId          String?
+  location                 String?
+  credits                  Int      @default(300)
+  createdAt                DateTime @default(now())
+  balanceHistory           StudentBalanceHistory[]
+  application              JobApplication[]
+}
+
+model Job{
+  id                       Int      @id @default(autoincrement())
+  roleName                 String
+  location                 String
+  minCTC                   Int
+  maxCTC                   Int
+  postedBy                 Int
+  company                  Company  @relation(fields: [postedBy],references: [id])
+  createdAt                DateTime @default(now())
+  applications             JobApplication[]
+}
+
+
+model JobApplication{
+  id                       Int      @id @default(autoincrement())
+  studentId                Int      
+  jobId                    Int
+  companyId                Int
+  job                      Job      @relation(fields: [jobId],references: [id])
+  student                  Student   @relation(fields: [studentId],references: [id])
+  createdAt                DateTime @default(now())
+}
+
+model StudentBalanceHistory{
+  id                      Int       @id @default(autoincrement())
+  type                    String
+  amount                  Int
+  createdAt               DateTime @default(now())
+  reason                  String  
+  studentId               Int
+  student                 Student   @relation(fields: [studentId],references: [id])
+}
+model CompanyBalanceHistory{
+  id                      Int       @id @default(autoincrement())
+  type                    String
+  amount                  Int
+  createdAt               DateTime @default(now())
+  reason                  String  
+  companyId               Int
+  company                 Company   @relation(fields: [companyId],references: [id])
+}
